@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export class PoliceOfficerService {
 
-    async registerPoliceOfficerUser(name: string, contactInfo: string, password: string, badgeNumber: string, station: string): Promise<IPoliceOfficer> {
+    async registerPoliceOfficerUser(name: string, contactInfo: string, password: string, station: string, badgeNumber: string): Promise<IPoliceOfficer> {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new PoliceOfficer({
@@ -59,6 +59,29 @@ export class PoliceOfficerService {
             throw new Error("There are no Police officers by that ID");
         }
         return officers;
+    }
+
+    async loginPoliceOfficer(badgeNumber: string, password: string): Promise<{ token: string; userType: string }>  {
+        const user = await PoliceOfficer.findOne({ badgeNumber });
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new Error("Invalid credentials");
+        }
+
+        const token = jwt.sign({ id: user._id, email: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
+            expiresIn: "1h",
+        });
+
+        const response = {
+            "token":token,
+            "userType": "PoliceOfficer"
+        }
+
+        return response;
     }
     
 
