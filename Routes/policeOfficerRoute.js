@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const policeOfficerController_1 = require("../Controllers/policeOfficerController");
+const router = (0, express_1.Router)();
+const policeOfficerController = new policeOfficerController_1.PoliceOfficerController();
+router.post("/auth/register", (req, res) => policeOfficerController.registerPoliceOfficerUser(req, res));
+router.delete("/delete/:id", (req, res) => policeOfficerController.deletePoliceOfficerUser(req, res));
+router.put("/edit/:id", (req, res) => policeOfficerController.editPoliceOfficerUser(req, res));
+router.get("/getall", (req, res) => policeOfficerController.getAllPoliceOfficerUser(req, res));
+exports.default = router;

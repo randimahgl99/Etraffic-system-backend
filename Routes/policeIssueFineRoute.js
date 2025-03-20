@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const policeIssueFineController_1 = require("./../Controllers/policeIssueFineController");
+const express_1 = require("express");
+const router = (0, express_1.Router)();
+router.post("/add", policeIssueFineController_1.addpoliceIssueFine);
+router.get("/all", policeIssueFineController_1.getAllPoliceIssueFines);
+router.get("/fines-get-by-NIC/:id", policeIssueFineController_1.getFinesByUserNIC);
+router.get("/policeOfficer-get-by-policeId/:id", policeIssueFineController_1.getPoliceById);
+exports.default = router;
