@@ -42,7 +42,11 @@ class CivilUserService {
             const token = jsonwebtoken_1.default.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET || "default_secret", {
                 expiresIn: "1h",
             });
-            return token;
+            const response = {
+                "token": token,
+                "userType": user.isAdmin
+            };
+            return response;
         });
     }
     registerAdminUser(name, email, password, idNumber) {

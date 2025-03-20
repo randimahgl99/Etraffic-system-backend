@@ -18,7 +18,7 @@ export class CivilUserService {
     }
 
 
-    async loginUser(email: string, password: string): Promise<string | null> {
+    async loginUser(email: string, password: string): Promise<{ token: string; userType: boolean }>  {
         const user = await CivilUser.findOne({ email });
         if (!user) {
             throw new Error("User not found");
@@ -33,7 +33,12 @@ export class CivilUserService {
             expiresIn: "1h",
         });
 
-        return token;
+        const response = {
+            "token":token,
+            "userType":user.isAdmin
+        }
+
+        return response;
     }
     async registerAdminUser(name: string, email: string, password: string, idNumber?: string): Promise<ICivilUser> {
         const hashedPassword = await bcrypt.hash(password, 10);

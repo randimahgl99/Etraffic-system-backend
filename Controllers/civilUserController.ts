@@ -26,12 +26,12 @@ export class CivilUserController {
         try {
             const { email, password } = req.body;
 
-            const token = await civilUserService.loginUser(email, password);
+            const response = await civilUserService.loginUser(email, password);
 
             res.status(200).json({
                 success: true,
                 message: "Login successful",
-                token,
+                response,
             });
         } catch (error: any) {
             res.status(400).json({ success: false, message: error.message });

@@ -33,11 +33,11 @@ class CivilUserController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { email, password } = req.body;
-                const token = yield civilUserService.loginUser(email, password);
+                const response = yield civilUserService.loginUser(email, password);
                 res.status(200).json({
                     success: true,
                     message: "Login successful",
-                    token,
+                    response,
                 });
             }
             catch (error) {
