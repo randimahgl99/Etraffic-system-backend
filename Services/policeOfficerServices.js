@@ -15,8 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PoliceOfficerService = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const PliceOfficer_1 = __importDefault(require("../Model/PliceOfficer"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class PoliceOfficerService {
-    registerPoliceOfficerUser(name, contactInfo, password, badgeNumber, station) {
+    registerPoliceOfficerUser(name, contactInfo, password, station, badgeNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
             const newUser = new PliceOfficer_1.default({
@@ -67,6 +68,26 @@ class PoliceOfficerService {
                 throw new Error("There are no Police officers by that ID");
             }
             return officers;
+        });
+    }
+    loginPoliceOfficer(badgeNumber, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield PliceOfficer_1.default.findOne({ badgeNumber });
+            if (!user) {
+                throw new Error("User not found");
+            }
+            const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
+            if (!isPasswordValid) {
+                throw new Error("Invalid credentials");
+            }
+            const token = jsonwebtoken_1.default.sign({ id: user._id, email: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
+                expiresIn: "1h",
+            });
+            const response = {
+                "token": token,
+                "userType": "PoliceOfficer"
+            };
+            return response;
         });
     }
 }
