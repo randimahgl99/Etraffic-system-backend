@@ -99,5 +99,32 @@ class CivilUserController {
             }
         });
     }
+    payFine(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.params.id;
+                const fineId = req.body;
+                const paidFine = yield civilUserService.payFine(userId, fineId);
+                res.status(200).json(paidFine);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
+    payFineStatus(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const userId = req.params.id;
+                const sessionId = req.body;
+                const transactionId = req.body;
+                const paidFineStatus = yield civilUserService.payFineStatus(userId, sessionId, transactionId);
+                res.status(200).json(paidFineStatus);
+            }
+            catch (error) {
+                res.status(400).json({ error: error.message });
+            }
+        });
+    }
 }
 exports.CivilUserController = CivilUserController;

@@ -43,6 +43,7 @@ const policeIssueFineSchema = new mongoose_1.Schema({
     isPaid: { type: Boolean, requied: true },
     type: { type: String, required: false },
     policeId: { type: String, required: false },
+    fineMangementId: { type: String, required: true },
 });
 const policeIssueFine = mongoose_1.default.model("PoliceIssueFine", policeIssueFineSchema);
 exports.default = policeIssueFine;

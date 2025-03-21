@@ -87,6 +87,29 @@ export class CivilUserController {
             res.status(400).json({ error: error.message });
         }
     }
+
+    async payFine(req: any, res: any): Promise<void> {
+        try {
+            const userId = req.params.id;
+            const fineId = req.body;
+            const paidFine = await civilUserService.payFine(userId, fineId);
+            res.status(200).json(paidFine);
+        } catch (error: any) {
+            res.status(400).json({ error: error.message });
+        }
+    }
+
+    async payFineStatus(req: any, res: any): Promise<void> {
+        try {
+            const userId = req.params.id;
+            const sessionId = req.body;
+            const transactionId = req.body;
+            const paidFineStatus = await civilUserService.payFineStatus(userId, sessionId, transactionId);
+            res.status(200).json(paidFineStatus);
+        } catch (error: any) {
+            res.status(400).json({ error: error.message });
+        }
+    }
     
     
 }

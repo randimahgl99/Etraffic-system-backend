@@ -6,13 +6,13 @@ const PoliceIssueFineServices = new policeIssueFineServices();
 
 export const addpoliceIssueFine = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId } = req.body;
+        const { civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId, fineMnagemntId } = req.body;
 
         // if (!civilUserName || !civilNIC || !type || !issueLocation || !vehicalNumber || !date ||!time ||!isPaid ||!policeId) {
         //     res.status(400).json({ message: "All fields are required" });
         // }
 
-        const newFine = new policeIssueFine({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid: false, policeId });
+        const newFine = new policeIssueFine({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid: false, policeId, fineMnagemntId });
         await newFine.save();
 
         res.status(201).json({ message: "Fine issued successfully", data: newFine });
