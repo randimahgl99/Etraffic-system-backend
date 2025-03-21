@@ -8,11 +8,11 @@ export const addpoliceIssueFine = async (req: Request, res: Response): Promise<v
     try {
         const { civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId } = req.body;
 
-        if (!civilUserName || !civilNIC || !type || !issueLocation || !vehicalNumber || !date ||!time ||!isPaid ||!policeId) {
-            res.status(400).json({ message: "All fields are required" });
-        }
+        // if (!civilUserName || !civilNIC || !type || !issueLocation || !vehicalNumber || !date ||!time ||!isPaid ||!policeId) {
+        //     res.status(400).json({ message: "All fields are required" });
+        // }
 
-        const newFine = new policeIssueFine({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId });
+        const newFine = new policeIssueFine({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid: false, policeId });
         await newFine.save();
 
         res.status(201).json({ message: "Fine issued successfully", data: newFine });

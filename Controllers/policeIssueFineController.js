@@ -19,10 +19,10 @@ const PoliceIssueFineServices = new policeIssueFineServices_1.policeIssueFineSer
 const addpoliceIssueFine = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId } = req.body;
-        if (!civilUserName || !civilNIC || !type || !issueLocation || !vehicalNumber || !date || !time || !isPaid || !policeId) {
-            res.status(400).json({ message: "All fields are required" });
-        }
-        const newFine = new policeIssueFine_1.default({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId });
+        // if (!civilUserName || !civilNIC || !type || !issueLocation || !vehicalNumber || !date ||!time ||!isPaid ||!policeId) {
+        //     res.status(400).json({ message: "All fields are required" });
+        // }
+        const newFine = new policeIssueFine_1.default({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid: false, policeId });
         yield newFine.save();
         res.status(201).json({ message: "Fine issued successfully", data: newFine });
     }
