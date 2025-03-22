@@ -44,7 +44,8 @@ class CivilUserService {
             });
             const response = {
                 "token": token,
-                "userType": user.isAdmin
+                "userType": user.isAdmin,
+                "nicNo": user.idNumber || "N/A"
             };
             return response;
         });

@@ -27,13 +27,22 @@ export class policeIssueFineServices {
         return issueFines;
     }
 
-    async getFinesByUserNIC (id : string): Promise<IPoliceIssueFine> {
-        const issueFines = await policeIssueFine.findOne({civilNIC:id})
-        if(!issueFines){
-            throw new Error("There are no Issue fine by that ID");
-        }
-        return issueFines;
+    async getFinesByUserNIC(id: string): Promise<IPoliceIssueFine[]> {
+            console.log("Received ID Type:", typeof id);
+            console.log("Received ID Value:", id);
+    
+            const issueFines = await policeIssueFine.find({ civilNIC: id });
+
+            console.log(issueFines);
+    
+            if (!issueFines || issueFines.length === 0) {
+                throw new Error("There are no Issue fines for that ID");
+            }
+    
+            return issueFines;
     }
+    
+    
 
     async getPoliceById (id : string ): Promise<IPoliceIssueFine[]>{
         const policeOfficer = await policeIssueFine.find({policeId:id})

@@ -42,9 +42,12 @@ class policeIssueFineServices {
     }
     getFinesByUserNIC(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const issueFines = yield policeIssueFine_1.default.findOne({ civilNIC: id });
-            if (!issueFines) {
-                throw new Error("There are no Issue fine by that ID");
+            console.log("Received ID Type:", typeof id);
+            console.log("Received ID Value:", id);
+            const issueFines = yield policeIssueFine_1.default.find({ civilNIC: id });
+            console.log(issueFines);
+            if (!issueFines || issueFines.length === 0) {
+                throw new Error("There are no Issue fines for that ID");
             }
             return issueFines;
         });

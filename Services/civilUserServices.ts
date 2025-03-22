@@ -18,7 +18,7 @@ export class CivilUserService {
     }
 
 
-    async loginUser(email: string, password: string): Promise<{ token: string; userType: boolean }>  {
+    async loginUser(email: string, password: string): Promise<{ token: string; userType: boolean; nicNo: string }>  {
         const user = await CivilUser.findOne({ email });
         if (!user) {
             throw new Error("User not found");
@@ -35,7 +35,8 @@ export class CivilUserService {
 
         const response = {
             "token":token,
-            "userType":user.isAdmin
+            "userType":user.isAdmin,
+            "nicNo":user.idNumber || "N/A"
         }
 
         return response;
