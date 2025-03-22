@@ -18,15 +18,16 @@ const policeIssueFineServices_1 = require("../Services/policeIssueFineServices")
 const PoliceIssueFineServices = new policeIssueFineServices_1.policeIssueFineServices();
 const addpoliceIssueFine = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId } = req.body;
-        if (!civilUserName || !civilNIC || !type || !issueLocation || !vehicalNumber || !date || !time || !isPaid || !policeId) {
-            res.status(400).json({ message: "All fields are required" });
-        }
-        const newFine = new policeIssueFine_1.default({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId });
+        const { civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid, policeId, fineManagementId } = req.body;
+        // if (!civilUserName || !civilNIC || !type || !issueLocation || !vehicalNumber || !date ||!time ||!isPaid ||!policeId) {
+        //     res.status(400).json({ message: "All fields are required" });
+        // }
+        const newFine = new policeIssueFine_1.default({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid: false, policeId, fineManagementId });
         yield newFine.save();
         res.status(201).json({ message: "Fine issued successfully", data: newFine });
     }
     catch (error) {
+        console.log(error);
         res.status(400).json({ message: "server error" });
     }
 });

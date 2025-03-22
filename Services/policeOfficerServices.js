@@ -72,7 +72,7 @@ class PoliceOfficerService {
     }
     loginPoliceOfficer(badgeNumber, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield PliceOfficer_1.default.findOne({ badgeNumber });
+            const user = yield PliceOfficer_1.default.findOne({ badgeNumber }).lean();
             if (!user) {
                 throw new Error("User not found");
             }
@@ -80,12 +80,13 @@ class PoliceOfficerService {
             if (!isPasswordValid) {
                 throw new Error("Invalid credentials");
             }
-            const token = jsonwebtoken_1.default.sign({ id: user._id, email: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
+            const token = jsonwebtoken_1.default.sign({ id: user._id.toString(), email: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
                 expiresIn: "1h",
             });
             const response = {
-                "token": token,
-                "userType": "PoliceOfficer"
+                token,
+                userType: "PoliceOfficer",
+                userId: user._id.toString()
             };
             return response;
         });

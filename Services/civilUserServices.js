@@ -16,8 +16,17 @@ exports.CivilUserService = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const CivilUser_1 = __importDefault(require("../Model/CivilUser"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const FineManagement_1 = __importDefault(require("../Model/FineManagement"));
+const stripe_1 = __importDefault(require("stripe"));
+const transaction_1 = __importDefault(require("../Model/transaction"));
+const policeIssueFine_1 = __importDefault(require("../Model/policeIssueFine"));
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeKey) {
+    throw new Error("STRIPE_SECRET_KEY is not defined in the environment variables");
+}
+const stripe = new stripe_1.default(stripeKey);
 class CivilUserService {
-    registerUser(name, email, password) {
+    registerUser(name, email, password, idNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
             const newUser = new CivilUser_1.default({
@@ -25,6 +34,7 @@ class CivilUserService {
                 email,
                 password: hashedPassword,
                 isAdmin: false,
+                idNumber,
             });
             return yield newUser.save();
         });
@@ -97,6 +107,70 @@ class CivilUserService {
             }
             Object.assign(user, updates);
             return yield user.save();
+        });
+    }
+    payFine(fineId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fine = yield policeIssueFine_1.default.findById(fineId);
+            if (!fine) {
+                throw new Error("Fine not found");
+            }
+            const fineMnagementData = yield FineManagement_1.default.findById(fine.fineManagementId);
+            if (!fineMnagementData) {
+                throw new Error("Fine management data not found");
+            }
+            const unitAmount = Number(fineMnagementData.fine) * 100;
+            //create stripe checkout session
+            const session = yield stripe.checkout.sessions.create({
+                payment_method_types: ["card"],
+                line_items: [
+                    {
+                        price_data: {
+                            currency: "usd",
+                            unit_amount: unitAmount, // Stripe expects amount in cents
+                        },
+                        quantity: 1,
+                    },
+                ],
+                mode: "payment",
+                cancel_url: `http://localhost:5173/payment-subscription/upgrade-false`,
+                success_url: `http://localhost:5173/payment-subscription/upgrade-success`,
+            });
+            //save transaction in db
+            const transactionData = {
+                fineId,
+                issueLocation: fine.issueLocation,
+                amount: fineMnagementData.fine,
+            };
+            const transaction = new transaction_1.default(transactionData);
+            yield transaction.save();
+            return {
+                sessionId: session.id,
+                url: session.url,
+                transactionId: transaction._id
+            };
+        });
+    }
+    payFineStatus(sessionId, transactionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const transaction = yield transaction_1.default.findById(transactionId);
+            if (!transaction) {
+                throw new Error("Transaction not found");
+            }
+            //get stripe checkout session data
+            const session = yield stripe.checkout.sessions.retrieve(sessionId);
+            let updatedTransaction;
+            if (session.payment_status == "paid") {
+                //update transaction in db
+                updatedTransaction = yield transaction_1.default.findByIdAndUpdate(transactionId, { status: "PAID" });
+                if (!updatedTransaction) {
+                    throw new Error('Transaction Update Failed');
+                }
+            }
+            else {
+                throw new Error('Paiment is pending');
+            }
+            return updatedTransaction;
         });
     }
 }

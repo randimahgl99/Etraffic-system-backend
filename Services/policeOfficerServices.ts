@@ -61,28 +61,30 @@ export class PoliceOfficerService {
         return officers;
     }
 
-    async loginPoliceOfficer(badgeNumber: string, password: string): Promise<{ token: string; userType: string }>  {
-        const user = await PoliceOfficer.findOne({ badgeNumber });
+    async loginPoliceOfficer(badgeNumber: string, password: string): Promise<{ token: string; userType: string; userId: string }>  {
+        const user = await PoliceOfficer.findOne({ badgeNumber }).lean();
         if (!user) {
             throw new Error("User not found");
         }
-
+    
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new Error("Invalid credentials");
         }
-
-        const token = jwt.sign({ id: user._id, email: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
+    
+        const token = jwt.sign({ id: user._id.toString(), email: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
             expiresIn: "1h",
         });
-
+    
         const response = {
-            "token":token,
-            "userType": "PoliceOfficer"
-        }
-
+            token,
+            userType: "PoliceOfficer",
+            userId: user._id.toString()
+        };
+    
         return response;
     }
+    
     
 
 }
