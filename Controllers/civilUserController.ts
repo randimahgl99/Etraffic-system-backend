@@ -8,19 +8,20 @@ const civilUserService = new CivilUserService();
 export class CivilUserController {
     async register(req: Request, res: Response): Promise<void> {
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, idNumber } = req.body;
 
-            const newUser = await civilUserService.registerUser(name, email, password);
+            const newUser = await civilUserService.registerUser(name, email, password, idNumber);
 
             res.status(201).json({
                 success: true,
                 message: "User registered successfully",
-                user: { id: newUser._id, name: newUser.name, email: newUser.email },
+                user: { id: newUser._id, name: newUser.name, email: newUser.email, idNumber: newUser.idNumber, },
             });
         } catch (error: any) {
             res.status(400).json({ success: false, message: error.message });
         }
     }
+    
 
     async login(req: Request, res: Response): Promise<void> {
         try {
@@ -90,9 +91,8 @@ export class CivilUserController {
 
     async payFine(req: any, res: any): Promise<void> {
         try {
-            const userId = req.params.id;
             const fineId = req.body;
-            const paidFine = await civilUserService.payFine(userId, fineId);
+            const paidFine = await civilUserService.payFine(fineId);
             res.status(200).json(paidFine);
         } catch (error: any) {
             res.status(400).json({ error: error.message });
@@ -101,10 +101,9 @@ export class CivilUserController {
 
     async payFineStatus(req: any, res: any): Promise<void> {
         try {
-            const userId = req.params.id;
             const sessionId = req.body;
             const transactionId = req.body;
-            const paidFineStatus = await civilUserService.payFineStatus(userId, sessionId, transactionId);
+            const paidFineStatus = await civilUserService.payFineStatus( sessionId, transactionId);
             res.status(200).json(paidFineStatus);
         } catch (error: any) {
             res.status(400).json({ error: error.message });

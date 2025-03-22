@@ -12,7 +12,7 @@ if (!stripeKey) {
 }
 const stripe = new stripeLib(stripeKey)
 export class CivilUserService {
-    async registerUser(name: string, email: string, password: string): Promise<ICivilUser> {
+    async registerUser(name: string, email: string, password: string, idNumber:string): Promise<ICivilUser> {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new CivilUser({
@@ -20,6 +20,7 @@ export class CivilUserService {
             email,
             password: hashedPassword,
             isAdmin: false,
+            idNumber, 
             
         });
 
@@ -108,19 +109,13 @@ export class CivilUserService {
         return await user.save();
     }
 
-    async payFine(userId: string, fineId: string): Promise<object> {
-        const user = await CivilUser.findById(userId);
-    
-        if (!user) {
-            throw new Error("User not found");
-        }
-
+    async payFine(fineId: string): Promise<object> {
         const fine = await policeIssueFine.findById(fineId)
         if(!fine){
             throw new Error("Fine not found");
         }
 
-        const fineMnagementData = await FineManagement.findById(fine.fineMangementId);
+        const fineMnagementData = await FineManagement.findById(fine.fineManagementId);
         if(!fineMnagementData){
             throw new Error("Fine management data not found")
         }
@@ -159,13 +154,7 @@ export class CivilUserService {
         };
     }
 
-    async payFineStatus(userId: string, sessionId: string, transactionId: string): Promise<object> {
-        const user = await CivilUser.findById(userId);
-    
-        if (!user) {
-            throw new Error("User not found");
-        }
-
+    async payFineStatus(sessionId: string, transactionId: string): Promise<object> {
         const transaction = await Transaction.findById(transactionId)
         if(!transaction){
             throw new Error("Transaction not found");

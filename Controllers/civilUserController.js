@@ -16,12 +16,12 @@ class CivilUserController {
     register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { name, email, password } = req.body;
-                const newUser = yield civilUserService.registerUser(name, email, password);
+                const { name, email, password, idNumber } = req.body;
+                const newUser = yield civilUserService.registerUser(name, email, password, idNumber);
                 res.status(201).json({
                     success: true,
                     message: "User registered successfully",
-                    user: { id: newUser._id, name: newUser.name, email: newUser.email },
+                    user: { id: newUser._id, name: newUser.name, email: newUser.email, idNumber: newUser.idNumber, },
                 });
             }
             catch (error) {
@@ -102,9 +102,8 @@ class CivilUserController {
     payFine(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const userId = req.params.id;
                 const fineId = req.body;
-                const paidFine = yield civilUserService.payFine(userId, fineId);
+                const paidFine = yield civilUserService.payFine(fineId);
                 res.status(200).json(paidFine);
             }
             catch (error) {
@@ -115,10 +114,9 @@ class CivilUserController {
     payFineStatus(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const userId = req.params.id;
                 const sessionId = req.body;
                 const transactionId = req.body;
-                const paidFineStatus = yield civilUserService.payFineStatus(userId, sessionId, transactionId);
+                const paidFineStatus = yield civilUserService.payFineStatus(sessionId, transactionId);
                 res.status(200).json(paidFineStatus);
             }
             catch (error) {

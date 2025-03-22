@@ -26,7 +26,7 @@ if (!stripeKey) {
 }
 const stripe = new stripe_1.default(stripeKey);
 class CivilUserService {
-    registerUser(name, email, password) {
+    registerUser(name, email, password, idNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
             const newUser = new CivilUser_1.default({
@@ -34,6 +34,7 @@ class CivilUserService {
                 email,
                 password: hashedPassword,
                 isAdmin: false,
+                idNumber,
             });
             return yield newUser.save();
         });
@@ -108,17 +109,13 @@ class CivilUserService {
             return yield user.save();
         });
     }
-    payFine(userId, fineId) {
+    payFine(fineId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield CivilUser_1.default.findById(userId);
-            if (!user) {
-                throw new Error("User not found");
-            }
             const fine = yield policeIssueFine_1.default.findById(fineId);
             if (!fine) {
                 throw new Error("Fine not found");
             }
-            const fineMnagementData = yield FineManagement_1.default.findById(fine.fineMangementId);
+            const fineMnagementData = yield FineManagement_1.default.findById(fine.fineManagementId);
             if (!fineMnagementData) {
                 throw new Error("Fine management data not found");
             }
@@ -154,12 +151,8 @@ class CivilUserService {
             };
         });
     }
-    payFineStatus(userId, sessionId, transactionId) {
+    payFineStatus(sessionId, transactionId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield CivilUser_1.default.findById(userId);
-            if (!user) {
-                throw new Error("User not found");
-            }
             const transaction = yield transaction_1.default.findById(transactionId);
             if (!transaction) {
                 throw new Error("Transaction not found");
