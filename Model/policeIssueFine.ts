@@ -10,6 +10,7 @@ export interface IPoliceIssueFine extends Document {
     isPaid : boolean;
     type : string;
     policeId : string;
+    fineManagementId: string;
     
 }
 
@@ -22,6 +23,7 @@ const policeIssueFineSchema: Schema = new Schema<IPoliceIssueFine>({
     isPaid : {type: Boolean, requied: true},
     type: { type: String, required: false },
     policeId: { type: String, required: false },
+    fineManagementId: { type: String, required: true },
 });
 
 const policeIssueFine: Model<IPoliceIssueFine> = mongoose.model<IPoliceIssueFine>("PoliceIssueFine", policeIssueFineSchema)
