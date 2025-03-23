@@ -91,7 +91,7 @@ export class CivilUserController {
 
     async payFine(req: any, res: any): Promise<void> {
         try {
-            const fineId = req.body;
+            const {fineId} = req.body;
             const paidFine = await civilUserService.payFine(fineId);
             res.status(200).json(paidFine);
         } catch (error: any) {

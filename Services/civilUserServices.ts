@@ -111,17 +111,25 @@ export class CivilUserService {
     }
 
     async payFine(fineId: string): Promise<object> {
+        console.log(typeof(fineId));
+        
+
         const fine = await policeIssueFine.findById(fineId)
         if(!fine){
             throw new Error("Fine not found");
         }
 
-        const fineMnagementData = await FineManagement.findById(fine.fineManagementId);
+        console.log(fine);
+
+        const fineMnagementData = await FineManagement.findById(fine.type);
+        console.log('2 line',fineMnagementData);
         if(!fineMnagementData){
             throw new Error("Fine management data not found")
         }
+        console.log('3 line');
 
         const unitAmount: number = Number(fineMnagementData.fine) * 100;
+        console.log('4 line');
 
         //create stripe checkout session
         const session = await stripe.checkout.sessions.create({
@@ -135,10 +143,12 @@ export class CivilUserService {
                   quantity: 1,
                },
             ],
+            
             mode: "payment",
             cancel_url: `http://localhost:5173/payment-subscription/upgrade-false`,
             success_url: `http://localhost:5173/payment-subscription/upgrade-success`,
         });
+        console.log('4 line');
 
         //save transaction in db
         const transactionData = {
@@ -147,7 +157,9 @@ export class CivilUserService {
             amount: fineMnagementData.fine,
         }
         const transaction = new Transaction(transactionData);
+        console.log('5 line');
         await transaction.save()
+        console.log('6 line');
         return {
             sessionId: session.id,
             url: session.url,

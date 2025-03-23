@@ -112,15 +112,20 @@ class CivilUserService {
     }
     payFine(fineId) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(typeof (fineId));
             const fine = yield policeIssueFine_1.default.findById(fineId);
             if (!fine) {
                 throw new Error("Fine not found");
             }
-            const fineMnagementData = yield FineManagement_1.default.findById(fine.fineManagementId);
+            console.log(fine);
+            const fineMnagementData = yield FineManagement_1.default.findById(fine.type);
+            console.log('2 line', fineMnagementData);
             if (!fineMnagementData) {
                 throw new Error("Fine management data not found");
             }
+            console.log('3 line');
             const unitAmount = Number(fineMnagementData.fine) * 100;
+            console.log('4 line');
             //create stripe checkout session
             const session = yield stripe.checkout.sessions.create({
                 payment_method_types: ["card"],
@@ -137,6 +142,7 @@ class CivilUserService {
                 cancel_url: `http://localhost:5173/payment-subscription/upgrade-false`,
                 success_url: `http://localhost:5173/payment-subscription/upgrade-success`,
             });
+            console.log('4 line');
             //save transaction in db
             const transactionData = {
                 fineId,
@@ -144,7 +150,9 @@ class CivilUserService {
                 amount: fineMnagementData.fine,
             };
             const transaction = new transaction_1.default(transactionData);
+            console.log('5 line');
             yield transaction.save();
+            console.log('6 line');
             return {
                 sessionId: session.id,
                 url: session.url,

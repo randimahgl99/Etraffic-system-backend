@@ -20,13 +20,15 @@ const addFine = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { offence, nature, type, fine, fineNumber } = req.body;
         if (!offence || !nature || !type || !fine || !fineNumber) {
             res.status(400).json({ message: "All fields are required" });
+            return;
         }
         const newFine = new FineManagement_1.default({ offence, nature, type, fine, fineNumber });
         yield newFine.save();
-        res.status(201).json({ message: "Fine added successfully", data: newFine });
+        res.status(201).json({ message: "Fine added successfully" });
     }
     catch (error) {
-        res.status(400).json({ message: "server error" });
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error });
     }
 });
 exports.addFine = addFine;

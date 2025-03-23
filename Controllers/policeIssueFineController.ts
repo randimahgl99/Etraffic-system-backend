@@ -12,6 +12,8 @@ export const addpoliceIssueFine = async (req: Request, res: Response): Promise<v
         //     res.status(400).json({ message: "All fields are required" });
         // }
 
+        console.log(req.body)
+
         const newFine = new policeIssueFine({ civilUserName, civilNIC, type, issueLocation, vehicalNumber, date, time, isPaid: false, policeId, fineManagementId });
         await newFine.save();
 
