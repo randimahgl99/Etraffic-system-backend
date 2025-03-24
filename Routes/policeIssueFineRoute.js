@@ -6,5 +6,6 @@ const router = (0, express_1.Router)();
 router.post("/add", policeIssueFineController_1.addpoliceIssueFine);
 router.get("/all", policeIssueFineController_1.getAllPoliceIssueFines);
 router.get("/fines-get-by-NIC/:id", policeIssueFineController_1.getFinesByUserNIC);
+router.get("/fines-get-by-id/:id", policeIssueFineController_1.getFinesById);
 router.get("/policeOfficer-get-by-policeId/:id", policeIssueFineController_1.getPoliceById);
 exports.default = router;

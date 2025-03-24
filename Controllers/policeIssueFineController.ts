@@ -36,6 +36,19 @@ export const getFinesByUserNIC = async (_req: Request, res: Response): Promise<v
 
 };
 
+export const getFinesById = async (_req: Request, res: Response): Promise<void> => {
+    try {
+        const id: string = _req.params.id;
+        const issueFines = await PoliceIssueFineServices.getFinesById(id);
+
+        res.status(200).json({ message: "Fines retrieved successfully", data: issueFines });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ message: "server error" });
+    }
+
+};
+
 export const getAllPoliceIssueFines = async (_req: Request, res: Response): Promise<void> => {
     try {
         const fines = await policeIssueFine.find();

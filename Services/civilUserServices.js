@@ -16,7 +16,6 @@ exports.CivilUserService = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const CivilUser_1 = __importDefault(require("../Model/CivilUser"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const FineManagement_1 = __importDefault(require("../Model/FineManagement"));
 const stripe_1 = __importDefault(require("stripe"));
 const transaction_1 = __importDefault(require("../Model/transaction"));
 const policeIssueFine_1 = __importDefault(require("../Model/policeIssueFine"));
@@ -110,22 +109,14 @@ class CivilUserService {
             return yield user.save();
         });
     }
-    payFine(fineId) {
+    payFine(fineId, amount) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(typeof (fineId));
             const fine = yield policeIssueFine_1.default.findById(fineId);
             if (!fine) {
                 throw new Error("Fine not found");
             }
-            console.log(fine);
-            const fineMnagementData = yield FineManagement_1.default.findById(fine.type);
-            console.log('2 line', fineMnagementData);
-            if (!fineMnagementData) {
-                throw new Error("Fine management data not found");
-            }
-            console.log('3 line');
-            const unitAmount = Number(fineMnagementData.fine) * 100;
-            console.log('4 line');
+            const unitAmount = Number(amount) * 100;
             //create stripe checkout session
             const session = yield stripe.checkout.sessions.create({
                 payment_method_types: ["card"],
@@ -134,20 +125,24 @@ class CivilUserService {
                         price_data: {
                             currency: "usd",
                             unit_amount: unitAmount, // Stripe expects amount in cents
+                            product_data: {
+                                name: "police issued fine", // Add product name here
+                                description: "A fine issues by police", // Optional but recommended
+                            },
                         },
                         quantity: 1,
                     },
                 ],
                 mode: "payment",
                 cancel_url: `http://localhost:5173/payment-subscription/upgrade-false`,
-                success_url: `http://localhost:5173/payment-subscription/upgrade-success`,
+                success_url: `http://localhost:3000/#/civilUserDash`,
             });
             console.log('4 line');
             //save transaction in db
             const transactionData = {
                 fineId,
                 issueLocation: fine.issueLocation,
-                amount: fineMnagementData.fine,
+                amount: amount
             };
             const transaction = new transaction_1.default(transactionData);
             console.log('5 line');
@@ -160,7 +155,7 @@ class CivilUserService {
             };
         });
     }
-    payFineStatus(sessionId, transactionId) {
+    payFineStatus(sessionId, transactionId, policeIssuedFineId) {
         return __awaiter(this, void 0, void 0, function* () {
             const transaction = yield transaction_1.default.findById(transactionId);
             if (!transaction) {
@@ -174,6 +169,12 @@ class CivilUserService {
                 updatedTransaction = yield transaction_1.default.findByIdAndUpdate(transactionId, { status: "PAID" });
                 if (!updatedTransaction) {
                     throw new Error('Transaction Update Failed');
+                }
+                //updaate police issued fine data
+                const updatedFine = yield policeIssueFine_1.default.findOneAndUpdate({ _id: policeIssuedFineId }, { isPaid: true });
+                console.log('payment', updatedFine);
+                if (!updatedFine) {
+                    throw new Error("Police issue fine update failed");
                 }
             }
             else {

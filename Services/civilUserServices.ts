@@ -110,7 +110,7 @@ export class CivilUserService {
         return await user.save();
     }
 
-    async payFine(fineId: string): Promise<object> {
+    async payFine(fineId: string, amount: number): Promise<object> {
         console.log(typeof(fineId));
         
 
@@ -119,17 +119,8 @@ export class CivilUserService {
             throw new Error("Fine not found");
         }
 
-        console.log(fine);
 
-        const fineMnagementData = await FineManagement.findById(fine.type);
-        console.log('2 line',fineMnagementData);
-        if(!fineMnagementData){
-            throw new Error("Fine management data not found")
-        }
-        console.log('3 line');
-
-        const unitAmount: number = Number(fineMnagementData.fine) * 100;
-        console.log('4 line');
+        const unitAmount: number = Number(amount) * 100;
 
         //create stripe checkout session
         const session = await stripe.checkout.sessions.create({
@@ -139,6 +130,10 @@ export class CivilUserService {
                   price_data: {
                      currency: "usd",
                      unit_amount: unitAmount, // Stripe expects amount in cents
+                     product_data: {
+                        name: "police issued fine", // Add product name here
+                        description: "A fine issues by police", // Optional but recommended
+                     },
                   },
                   quantity: 1,
                },
@@ -146,7 +141,7 @@ export class CivilUserService {
             
             mode: "payment",
             cancel_url: `http://localhost:5173/payment-subscription/upgrade-false`,
-            success_url: `http://localhost:5173/payment-subscription/upgrade-success`,
+            success_url: `http://localhost:3000/#/civilUserDash`,
         });
         console.log('4 line');
 
@@ -154,7 +149,7 @@ export class CivilUserService {
         const transactionData = {
             fineId,
             issueLocation: fine.issueLocation,
-            amount: fineMnagementData.fine,
+            amount: amount
         }
         const transaction = new Transaction(transactionData);
         console.log('5 line');
@@ -167,7 +162,7 @@ export class CivilUserService {
         };
     }
 
-    async payFineStatus(sessionId: string, transactionId: string): Promise<object> {
+    async payFineStatus(sessionId: string, transactionId: string, policeIssuedFineId: string): Promise<object> {
         const transaction = await Transaction.findById(transactionId)
         if(!transaction){
             throw new Error("Transaction not found");
@@ -182,6 +177,14 @@ export class CivilUserService {
             updatedTransaction = await Transaction.findByIdAndUpdate(transactionId, {status: "PAID"});
             if(!updatedTransaction){
                 throw new Error('Transaction Update Failed')
+            }
+
+            //updaate police issued fine data
+            const updatedFine = await policeIssueFine.findOneAndUpdate({_id:policeIssuedFineId}, {isPaid:true})
+
+            console.log('payment',updatedFine);
+            if(!updatedFine){
+                throw new Error("Police issue fine update failed")
             }
         }else{
             throw new Error('Paiment is pending')

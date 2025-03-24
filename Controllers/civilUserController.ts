@@ -91,8 +91,8 @@ export class CivilUserController {
 
     async payFine(req: any, res: any): Promise<void> {
         try {
-            const {fineId} = req.body;
-            const paidFine = await civilUserService.payFine(fineId);
+            const {policeIssuedFineId, amount} = req.body;
+            const paidFine = await civilUserService.payFine(policeIssuedFineId, amount);
             res.status(200).json(paidFine);
         } catch (error: any) {
             res.status(400).json({ error: error.message });
@@ -101,9 +101,9 @@ export class CivilUserController {
 
     async payFineStatus(req: any, res: any): Promise<void> {
         try {
-            const sessionId = req.body;
-            const transactionId = req.body;
-            const paidFineStatus = await civilUserService.payFineStatus( sessionId, transactionId);
+            console.log(1)
+            const {sessionId, transactionId, policeIssuedFineId} = req.body
+            const paidFineStatus = await civilUserService.payFineStatus( sessionId, transactionId, policeIssuedFineId);
             res.status(200).json(paidFineStatus);
         } catch (error: any) {
             res.status(400).json({ error: error.message });

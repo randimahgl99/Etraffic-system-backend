@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPoliceById = exports.getAllPoliceIssueFines = exports.getFinesByUserNIC = exports.addpoliceIssueFine = void 0;
+exports.getPoliceById = exports.getAllPoliceIssueFines = exports.getFinesById = exports.getFinesByUserNIC = exports.addpoliceIssueFine = void 0;
 const policeIssueFine_1 = __importDefault(require("../Model/policeIssueFine"));
 const policeIssueFineServices_1 = require("../Services/policeIssueFineServices");
 const PoliceIssueFineServices = new policeIssueFineServices_1.policeIssueFineServices();
@@ -44,6 +44,18 @@ const getFinesByUserNIC = (_req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.getFinesByUserNIC = getFinesByUserNIC;
+const getFinesById = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = _req.params.id;
+        const issueFines = yield PoliceIssueFineServices.getFinesById(id);
+        res.status(200).json({ message: "Fines retrieved successfully", data: issueFines });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({ message: "server error" });
+    }
+});
+exports.getFinesById = getFinesById;
 const getAllPoliceIssueFines = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const fines = yield policeIssueFine_1.default.find();

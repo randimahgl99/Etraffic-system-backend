@@ -9,5 +9,5 @@ router.post("/auth/login", (req, res) => civilUserController.login(req, res));
 router.delete("/:id", (req, res) => civilUserController.deleteUser(req, res));
 router.put("/:id", (req, res) => civilUserController.editUser(req, res));
 router.post("/pay-fine", (req, res) => civilUserController.payFine(req, res));
-router.put("/pay-fine-status", (req, res) => civilUserController.payFineStatus(req, res));
+router.post("/pay-fine-status", (req, res) => civilUserController.payFineStatus(req, res));
 exports.default = router;

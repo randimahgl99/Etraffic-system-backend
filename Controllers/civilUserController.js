@@ -102,8 +102,8 @@ class CivilUserController {
     payFine(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fineId } = req.body;
-                const paidFine = yield civilUserService.payFine(fineId);
+                const { policeIssuedFineId, amount } = req.body;
+                const paidFine = yield civilUserService.payFine(policeIssuedFineId, amount);
                 res.status(200).json(paidFine);
             }
             catch (error) {
@@ -114,9 +114,9 @@ class CivilUserController {
     payFineStatus(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const sessionId = req.body;
-                const transactionId = req.body;
-                const paidFineStatus = yield civilUserService.payFineStatus(sessionId, transactionId);
+                console.log(1);
+                const { sessionId, transactionId, policeIssuedFineId } = req.body;
+                const paidFineStatus = yield civilUserService.payFineStatus(sessionId, transactionId, policeIssuedFineId);
                 res.status(200).json(paidFineStatus);
             }
             catch (error) {

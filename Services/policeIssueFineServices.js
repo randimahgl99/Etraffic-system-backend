@@ -52,6 +52,24 @@ class policeIssueFineServices {
             return issueFines;
         });
     }
+    getFinesById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("Received ID Type:", typeof id);
+                console.log("Received ID Value:", id);
+                const issueFines = yield policeIssueFine_1.default.findOne({ _id: id });
+                console.log(issueFines);
+                if (!issueFines) {
+                    throw new Error("There are no Issue fines for that ID");
+                }
+                return issueFines;
+            }
+            catch (error) {
+                console.log(error);
+                throw new Error(error.message);
+            }
+        });
+    }
     getPoliceById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const policeOfficer = yield policeIssueFine_1.default.find({ policeId: id });
