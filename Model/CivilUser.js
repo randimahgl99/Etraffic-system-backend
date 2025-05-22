@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const validator_1 = __importDefault(require("validator"));
 const civilUserSchema = new mongoose_1.Schema({
+    _id: { type: String },
     name: { type: String, required: true },
     email: {
         type: String,

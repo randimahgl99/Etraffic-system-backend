@@ -2,12 +2,16 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 import validator from "validator";
 
 
+
+
 export interface ITransaction extends Document {
     fineId: string;
     issueLocation: string;
     amount: number;
     status: string
 }
+
+
 
 const transactionSchema: Schema = new Schema<ITransaction>({
     fineId: { type: String, required: true },

@@ -20,6 +20,7 @@ const FineManagement_1 = __importDefault(require("../Model/FineManagement"));
 const stripe_1 = __importDefault(require("stripe"));
 const transaction_1 = __importDefault(require("../Model/transaction"));
 const policeIssueFine_1 = __importDefault(require("../Model/policeIssueFine"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeKey) {
     throw new Error("STRIPE_SECRET_KEY is not defined in the environment variables");
@@ -53,9 +54,9 @@ class CivilUserService {
                 expiresIn: "1h",
             });
             const response = {
-                "token": token,
-                "userType": user.isAdmin,
-                "nicNo": user.idNumber || "N/A"
+                token: token,
+                userType: user.isAdmin,
+                nicNo: user.idNumber || "N/A",
             };
             return response;
         });
@@ -112,7 +113,8 @@ class CivilUserService {
     }
     payFine(fineId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const fine = yield policeIssueFine_1.default.findById(fineId);
+            const fineObjectId = new mongoose_1.default.Types.ObjectId(fineId);
+            const fine = yield policeIssueFine_1.default.findById(fineObjectId);
             if (!fine) {
                 throw new Error("Fine not found");
             }
@@ -129,6 +131,9 @@ class CivilUserService {
                         price_data: {
                             currency: "usd",
                             unit_amount: unitAmount, // Stripe expects amount in cents
+                            product_data: {
+                                name: "Traffic Fine Payment",
+                            },
                         },
                         quantity: 1,
                     },
@@ -148,7 +153,7 @@ class CivilUserService {
             return {
                 sessionId: session.id,
                 url: session.url,
-                transactionId: transaction._id
+                transactionId: transaction._id,
             };
         });
     }
@@ -163,13 +168,15 @@ class CivilUserService {
             let updatedTransaction;
             if (session.payment_status == "paid") {
                 //update transaction in db
-                updatedTransaction = yield transaction_1.default.findByIdAndUpdate(transactionId, { status: "PAID" });
+                updatedTransaction = yield transaction_1.default.findByIdAndUpdate(transactionId, {
+                    status: "PAID",
+                });
                 if (!updatedTransaction) {
-                    throw new Error('Transaction Update Failed');
+                    throw new Error("Transaction Update Failed");
                 }
             }
             else {
-                throw new Error('Paiment is pending');
+                throw new Error("Payment is pending");
             }
             return updatedTransaction;
         });

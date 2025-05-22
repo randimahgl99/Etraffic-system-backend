@@ -102,7 +102,7 @@ class CivilUserController {
     payFine(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const fineId = req.body;
+                const { fineId } = req.body;
                 const paidFine = yield civilUserService.payFine(fineId);
                 res.status(200).json(paidFine);
             }
