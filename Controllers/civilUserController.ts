@@ -8,14 +8,20 @@ const civilUserService = new CivilUserService();
 export class CivilUserController {
     async register(req: Request, res: Response): Promise<void> {
         try {
-            const { name, email, password, idNumber } = req.body;
+            const { name, email, password, isAdmin, idNumber } = req.body;
 
-            const newUser = await civilUserService.registerUser(name, email, password, idNumber);
+            const newUser = await civilUserService.registerUser(name, email, password, idNumber, isAdmin);
 
             res.status(201).json({
                 success: true,
                 message: "User registered successfully",
-                user: { id: newUser._id, name: newUser.name, email: newUser.email, idNumber: newUser.idNumber, },
+                user: { 
+                    id: newUser._id, 
+                    name: newUser.name, 
+                    email: newUser.email, 
+                    isAdmin: newUser.isAdmin,
+                    idNumber: newUser.idNumber
+                },
             });
         } catch (error: any) {
             res.status(400).json({ success: false, message: error.message });
@@ -32,7 +38,14 @@ export class CivilUserController {
             res.status(200).json({
                 success: true,
                 message: "Login successful",
-                response,
+                user: {
+                    id: response.userId,
+                    name: response.name,
+                    email: response.email,
+                    isAdmin: response.isAdmin,
+                    nicNo: response.nicNo,
+                    token: response.token
+                }
             });
         } catch (error: any) {
             res.status(400).json({ success: false, message: error.message });
@@ -43,12 +56,22 @@ export class CivilUserController {
         try {
             const { name, email, password, idNumber } = req.body;
 
+            if (!idNumber) {
+                throw new Error("ID Number is required for admin registration");
+            }
+
             const newUser = await civilUserService.registerAdminUser(name, email, password, idNumber);
 
             res.status(201).json({
                 success: true,
-                message: "User registered successfully",
-                user: { id: newUser._id, name: newUser.name, email: newUser.email, idNumber: newUser.idNumber, },
+                message: "Admin registered successfully",
+                user: { 
+                    id: newUser._id, 
+                    name: newUser.name, 
+                    email: newUser.email, 
+                    idNumber: newUser.idNumber,
+                    isAdmin: newUser.isAdmin 
+                },
             });
         } catch (error: any) {
             res.status(400).json({ success: false, message: error.message });
@@ -88,10 +111,10 @@ export class CivilUserController {
             res.status(400).json({ error: error.message });
         }
     }
-    
+
     async payFine(req: any, res: any): Promise<void> {
         try {
-            const { fineId } = req.body;
+            const fineId = req.body;
             const paidFine = await civilUserService.payFine(fineId);
             res.status(200).json(paidFine);
         } catch (error: any) {
@@ -109,6 +132,24 @@ export class CivilUserController {
             res.status(400).json({ error: error.message });
         }
     }
-    
-    
+
+    async getAllUsers(req: Request, res: Response): Promise<void> {
+        try {
+            const isAdmin = req.query.isAdmin === 'true' ? true : 
+                          req.query.isAdmin === 'false' ? false : 
+                          undefined;
+            
+            const users = await civilUserService.getAllUsers(isAdmin);
+            
+            res.status(200).json({
+                success: true,
+                data: users
+            });
+        } catch (error: any) {
+            res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
 }

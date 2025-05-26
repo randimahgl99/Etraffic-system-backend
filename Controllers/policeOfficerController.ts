@@ -61,20 +61,28 @@ export class PoliceOfficerController {
     }
 
     async login(req: Request, res: Response): Promise<void> {
-            try {
-                const { badgeNumber, password } = req.body;
-    
-                const response = await policeOfficerServices.loginPoliceOfficer(badgeNumber, password);
-    
-                res.status(200).json({
-                    success: true,
-                    message: "Login successful",
-                    response,
-                });
-            } catch (error: any) {
-                res.status(400).json({ success: false, message: error.message });
-            }
+        try {
+            const { badgeNumber, password } = req.body;
+
+            const response = await policeOfficerServices.loginPoliceOfficer(badgeNumber, password);
+
+            res.status(200).json({
+                success: true,
+                message: "Login successful",
+                user: {
+                    id: response.userId,
+                    name: response.name,
+                    contactInfo: response.contactInfo,
+                    station: response.station,
+                    badgeNumber: response.badgeNumber,
+                    userType: response.userType,
+                    token: response.token
+                }
+            });
+        } catch (error: any) {
+            res.status(400).json({ success: false, message: error.message });
         }
+    }
     
     
 }

@@ -1,4 +1,4 @@
-import mongoose, {Schema, Model} from "mongoose";
+import mongoose, {Schema, Model, Types} from "mongoose";
 
 export interface IPoliceIssueFine extends Document {
     civilUserName : string;
@@ -11,7 +11,7 @@ export interface IPoliceIssueFine extends Document {
     type : string;
     policeId : string;
     fineManagementId: string;
-    
+    offence: Types.ObjectId; 
 }
 
 const policeIssueFineSchema: Schema = new Schema<IPoliceIssueFine>({
@@ -24,6 +24,8 @@ const policeIssueFineSchema: Schema = new Schema<IPoliceIssueFine>({
     type: { type: String, required: false },
     policeId: { type: String, required: false },
     fineManagementId: { type: String, required: true },
+    vehicalNumber: { type: String, required: false },
+    offence: { type: mongoose.Schema.Types.ObjectId, ref: "FineManagement", required: false },
 });
 
 const policeIssueFine: Model<IPoliceIssueFine> = mongoose.model<IPoliceIssueFine>("PoliceIssueFine", policeIssueFineSchema)

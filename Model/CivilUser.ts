@@ -8,11 +8,9 @@ export interface ICivilUser extends Document {
     password: string;
     isAdmin: boolean;
     idNumber?: string;
-    _id : string;
 }
 
 const civilUserSchema: Schema = new Schema<ICivilUser>({
-    _id: {type: String},
     name: { type: String, required: true },
     email: { 
         type: String,

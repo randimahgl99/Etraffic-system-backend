@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import PoliceOfficer, { IPoliceOfficer } from "../Model/PliceOfficer";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 export class PoliceOfficerService {
 
@@ -61,8 +62,8 @@ export class PoliceOfficerService {
         return officers;
     }
 
-    async loginPoliceOfficer(badgeNumber: string, password: string): Promise<{ token: string; userType: string; userId: string }>  {
-        const user = await PoliceOfficer.findOne({ badgeNumber }).lean();
+    async loginPoliceOfficer(badgeNumber: string, password: string): Promise<{ token: string; userType: string; userId: string; name: string; contactInfo: string; station: string; badgeNumber: string }>  {
+        const user = await PoliceOfficer.findOne({ badgeNumber }) as IPoliceOfficer | null;
         if (!user) {
             throw new Error("User not found");
         }
@@ -72,14 +73,18 @@ export class PoliceOfficerService {
             throw new Error("Invalid credentials");
         }
     
-        const token = jwt.sign({ id: user._id.toString(), email: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
+        const token = jwt.sign({ id: (user._id as mongoose.Types.ObjectId).toString(), badgeNumber: user.badgeNumber }, process.env.JWT_SECRET || "default_secret", {
             expiresIn: "1h",
         });
     
         const response = {
             token,
             userType: "PoliceOfficer",
-            userId: user._id.toString()
+            userId: (user._id as mongoose.Types.ObjectId).toString(),
+            name: user.name,
+            contactInfo: user.contactInfo,
+            station: user.station || "N/A",
+            badgeNumber: user.badgeNumber
         };
     
         return response;

@@ -64,3 +64,31 @@ export const getAllFines = async (_req: Request, res: Response): Promise<void> =
         res.status(400).json({ message: "server error" });
     }
 };
+
+export const getFineById = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const fine = await FineManagement.findById(id);
+        if (!fine) {
+            res.status(404).json({ 
+                success: false,
+                message: "Fine not found" 
+            });
+            return;
+        }
+
+        res.status(200).json({ 
+            success: true,
+            message: "Fine retrieved successfully", 
+            data: fine 
+        });
+    } catch (error:any) {
+        console.error("Error fetching fine:", error);
+        res.status(500).json({ 
+            success: false,
+            message: "Server error",
+            error: error.message 
+        });
+    }
+};
